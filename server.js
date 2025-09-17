@@ -218,9 +218,6 @@ wss.on("connection", (ws) => {
 
 // Start server
 server.listen(8080, () => {
-  console.log("====================================");
-  console.log("        Chat Server Running         ");
-  console.log("====================================");
   console.log("🚀 Server started on port 8080");
   console.log("📁 Upload endpoint: http://localhost:8080/upload");
   console.log("🗑️ Delete endpoint: http://localhost:8080/delete/:filename");
