@@ -49,21 +49,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
   res.json({ url, filename });
 });
 
-// Delete file endpoint
-app.delete('/delete/:filename', (req, res) => {
-  const filename = req.params.filename;
-  const filePath = path.join(UPLOAD_DIR, filename);
-
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.log('File not found or already deleted:', filename);
-      return res.status(404).json({ error: 'File not found' });
-    }
-    console.log('File deleted:', filename);
-    res.json({ message: 'File deleted successfully' });
-  });
-});
-
 // Health check
 app.get('/', (req, res) => {
   res.send('Chat server is running');
@@ -220,6 +205,5 @@ wss.on("connection", (ws) => {
 server.listen(8080, () => {
   console.log("🚀 Server started on port 8080");
   console.log("📁 Upload endpoint: http://localhost:8080/upload");
-  console.log("🗑️ Delete endpoint: http://localhost:8080/delete/:filename");
   console.log("🔗 WebSocket endpoint: ws://localhost:8080/ws");
 });
