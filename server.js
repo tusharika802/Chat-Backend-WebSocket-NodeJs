@@ -9,6 +9,7 @@ const express = require('express');
 const multer = require('multer');
 const cors = require('cors');
 const WebSocket = require('ws');
+const FEEDBACK_FILE = path.join(__dirname, 'feedback.json');
 
 // ---------- HTTP APP ----------
 const app = express();
@@ -200,7 +201,40 @@ wss.on("connection", (ws) => {
     console.log("⚠️ Client disconnected");
   });
 });
+// Initialize feedback file if it doesn't exist
+if (!fs.existsSync(FEEDBACK_FILE)) {
+  fs.writeFileSync(FEEDBACK_FILE, JSON.stringify([]));
+}
 
+// Feedback API: receive feedback from clients
+app.post('/feedback', (req, res) => {
+  const { userId, room, issue } = req.body;
+
+  if (!userId || !issue) {
+    return res.status(400).json({ error: 'Missing userId or issue' });
+  }
+
+  // Read existing feedback
+  const feedbackList = JSON.parse(fs.readFileSync(FEEDBACK_FILE));
+
+  // Add new feedback
+  const newFeedback = {
+    id: Date.now(),
+    userId,
+    room: room || 'general',
+    issue,
+    createdAt: new Date().toISOString()
+  };
+
+  feedbackList.push(newFeedback);
+
+  // Save back to file
+  fs.writeFileSync(FEEDBACK_FILE, JSON.stringify(feedbackList, null, 2));
+
+  console.log(`📝 Feedback received from ${userId}: ${issue}`);
+
+  res.json({ message: 'Feedback sent successfully!' });
+});
 // Start server
 server.listen(8080, () => {
   console.log("🚀 Server started on port 8080");
